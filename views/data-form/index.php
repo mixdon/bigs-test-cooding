@@ -32,30 +32,32 @@ $this->title = 'Data Pemeriksaan';
             ],
 
             [
-                'label' => 'Tinggi',
+                'label' => 'Tinggi (cm)',
                 'value' => function($m){
-                    return $m->tinggi_badan ? $m->tinggi_badan.' cm' : '-';
+                    return $m->tb ? $m->tb.' cm' : '-';
                 }
             ],
 
             [
-                'label' => 'Berat',
+                'label' => 'Berat (kg)',
                 'value' => function($m){
-                    return $m->berat_badan ? $m->berat_badan.' kg' : '-';
+                    return $m->bb ? $m->bb.' kg' : '-';
                 }
             ],
 
             [
                 'label' => 'IMT',
                 'value' => function($m){
-                    return $m->hitungIMT() ?? '-';
+                    // Pastikan method hitungIMT() ada di model DataForm
+                    return method_exists($m, 'hitungIMT') ? $m->hitungIMT() : '-';
                 }
             ],
 
             [
                 'label' => 'Kategori',
                 'value' => function($m){
-                    return $m->getKategoriIMT() ?? '-';
+                    // Pastikan method getKategoriIMT() ada di model DataForm
+                    return method_exists($m, 'getKategoriIMT') ? $m->getKategoriIMT() : '-';
                 }
             ],
 

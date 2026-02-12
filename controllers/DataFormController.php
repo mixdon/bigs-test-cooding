@@ -30,17 +30,13 @@ class DataFormController extends Controller
     public function actionCreate($id_registrasi)
     {
         $registrasi = Registrasi::findOne($id_registrasi);
-        if (!$registrasi) {
-            throw new NotFoundHttpException('Registrasi tidak ditemukan');
-        }
+        if (!$registrasi) throw new NotFoundHttpException('Registrasi tidak ditemukan');
 
         $existing = DataForm::find()
             ->where(['id_registrasi' => $id_registrasi, 'is_delete' => false])
             ->one();
 
-        if ($existing) {
-            return $this->redirect(['update', 'id' => $existing->id_form_data]);
-        }
+        if ($existing) return $this->redirect(['update', 'id' => $existing->id_form_data]);
 
         $model = new DataForm();
         $model->id_registrasi = $id_registrasi;
@@ -82,16 +78,13 @@ class DataFormController extends Controller
         $model = $this->findModel($id);
         $model->is_delete = true;
         $model->save(false);
-
         return $this->redirect(['index']);
     }
 
     public function actionEditRegistrasi($id_registrasi)
     {
         $model = Registrasi::findOne($id_registrasi);
-        if (!$model) {
-            throw new NotFoundHttpException('Registrasi tidak ditemukan');
-        }
+        if (!$model) throw new NotFoundHttpException('Registrasi tidak ditemukan');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['/registrasi/view', 'id_registrasi' => $model->id_registrasi]);
@@ -106,14 +99,11 @@ class DataFormController extends Controller
             ->where(['id_form_data' => $id, 'is_delete' => false])
             ->one();
 
-        if ($model !== null) {
-            return $model;
-        }
+        if ($model !== null) return $model;
 
         throw new NotFoundHttpException('Data tidak ditemukan');
     }
 
-    // Fungsi tunggal untuk generate PDF
     protected function generatePdfFile($model)
     {
         $data = $model->data ? json_decode($model->data, true) : [];
@@ -131,26 +121,27 @@ class DataFormController extends Controller
             'margin_left' => 15,
             'margin_right' => 15,
             'margin_top' => 15,
-            'margin_bottom' => 15
+            'margin_bottom' => 15,
+            'tempDir' => Yii::getAlias('@runtime/mpdf'),
+            'default_font_size' => 10,
+            'default_font' => 'dejavusans'
         ]);
 
         $pdf->WriteHTML($content);
 
-        $filename = 'hasil-pemeriksaan-' . $model->id_form_data . '.pdf';
+        $namaPasien = preg_replace('/[^A-Za-z0-9\- ]/', '', $registrasi->nama_pasien ?? 'Pasien');
+        $noRegis = preg_replace('/[^A-Za-z0-9\-]/', '', $registrasi->no_registrasi ?? '0000');
+        $filename = 'Pemeriksaan ' . $namaPasien . ' (' . $noRegis . ').pdf';
+
         $filePath = Yii::getAlias('@webroot/uploads/pdf/' . $filename);
-
-        // simpan PDF di server
         $pdf->Output($filePath, \Mpdf\Output\Destination::FILE);
-
         return $filePath;
     }
 
-    // Action generate PDF dan redirect ke download
     public function actionDownloadPdf($id)
     {
         $model = $this->findModel($id);
         $filePath = $this->generatePdfFile($model);
-
         return \Yii::$app->response->sendFile($filePath, basename($filePath));
     }
 }

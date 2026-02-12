@@ -60,11 +60,20 @@ use yii\widgets\ActiveForm;
             ]) ?>
     </div>
 
-    <div class="col-12 mt-3">
-        <?= Html::submitButton(
-            $model->isNewRecord ? 'Simpan Registrasi' : 'Update',
-            ['class'=>'btn btn-primary px-4']
-        ) ?>
+    <!-- BUTTON AREA -->
+    <div class="col-12 mt-4">
+        <div class="d-flex justify-content-end gap-2">
+            <?= Html::a(
+                'Kembali',
+                ['index'], // arahkan ke halaman index
+                ['class'=>'btn btn-outline-secondary px-4']
+            ) ?>
+
+            <?= Html::submitButton(
+                $model->isNewRecord ? 'Simpan' : 'Update',
+                ['class'=>'btn btn-primary px-4']
+            ) ?>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>
